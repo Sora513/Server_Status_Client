@@ -194,7 +194,9 @@ function syncfile() {
       console.log(err);
     } else {
       NetworkIO = [];
-      Network = data.toString().split(/\r\n|\r|\n/);
+      Network = data.toString().split(/\r\n|\r|\n/).filter(function(e) {
+        return e !== "";
+      });;
       for (var i = 0; i < Network.length - 2; i++) {
         //空文字をfillterで消去
         Network_name[i] = Network[2 + i].split(/\s/).filter(function(e) {
@@ -227,7 +229,9 @@ function syncfile() {
       console.log(err);
     } else {
       DiskIO = [];
-      Disk = data.toString().split(/\r\n|\r|\n/);
+      Disk = data.toString().split(/\r\n|\r|\n/).filter(function(e) {
+        return e !== "";
+      });;
       for (var i = 0; i < Disk.length; i++) {
         //空文字を消去
         Disk_name[i] = Disk[i].split(/\s/).filter(function(e) {
