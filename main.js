@@ -59,7 +59,10 @@ function setupfunc() {
   Network = fs
     .readFileSync("/proc/net/dev")
     .toString()
-    .split(/\r\n|\r|\n/);
+    .split(/\r\n|\r|\n/)
+    .filter(function(e) {
+      return e !== "";
+    });
   for (var i = 0; i < Network.length - 2; i++) {
     //空文字をfillterで消去
     Network_name[i] = Network[2 + i].split(/\s/).filter(function(e) {
@@ -83,7 +86,10 @@ function setupfunc() {
   Disk = fs
     .readFileSync("/proc/diskstats")
     .toString()
-    .split(/\r\n|\r|\n/);
+    .split(/\r\n|\r|\n/)
+    .filter(function(e) {
+      return e !== "";
+    });
   for (var i = 0; i < Disk.length; i++) {
     //空文字を消去
     Disk_name[i] = Disk[i].split(/\s/).filter(function(e) {
