@@ -260,8 +260,8 @@ function syncfile() {
         Network_TX[i] = (Network_TX_now[i] - Network_TX_prev[i]) / interval;
         NetworkIO.push({
           Name: Network_name[i],
-          RX: Network_RX[i],
-          TX: Network_TX[i]
+          RX: Network_RX[i].toFixed(4),
+          TX: Network_TX[i].toFixed(4)
         });
       }
     }
@@ -297,8 +297,8 @@ function syncfile() {
           (Disk_IOWrite_now[i] - Disk_IOWrite_prev[i]) / interval;
         DiskIO.push({
           Name: Disk_name[i],
-          IOReadPS: Disk_IORead[i],
-          IOWritePS: Disk_IOWrite[i]
+          IOReadPS: Disk_IORead[i].toFixed(4),
+          IOWritePS: Disk_IOWrite[i].toFixed(4)
         });
       }
     }
@@ -442,7 +442,7 @@ function CheckStatus() {
     //postData
      POSTData = {
         Name: Client_Name,
-        CPU_IOWait: CPU_IOWait,
+        CPU_IOWait: CPU_IOWait.toFixed(4),
         NetworkIO: NetworkIO,
         DiskIO: DiskIO,
         RAM: RAMstatus,
