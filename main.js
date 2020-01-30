@@ -60,6 +60,7 @@ const headers = {
 };
 //POSTData
 var POSTData={}
+var POSTDataStr=""
 
 //起動時のみ実行する
 function setupfunc() {
@@ -402,8 +403,31 @@ function syncfile() {
 
 //httpsでPOSTする関数
 function httpspost(){
-  let postDataStr = JSON.stringify(postData);
+  POSTDataStr = JSON.stringify(postData);
   console.log(postDataStr)
+  let options = {
+    host: HOST,
+    port: 443,
+    path: PATH,
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(POSTDataStr)
+    }
+};
+let req = http.request(options, (res) => {
+  console.log('STATUS: ' + res.statusCode);
+  console.log('HEADERS: ' + JSON.stringify(res.headers));
+  res.setEncoding('utf8');
+  res.on('data', (chunk) => {
+    console.log('BODY: ' + chunk);
+  });
+});
+req.on('error', (e) => {
+  console.log('problem with request: ' + e.message);
+});
+req.write(POSTDataStr);
+req.end();
 }
 
 //定期実行する関数の定義
@@ -415,20 +439,14 @@ function CheckStatus() {
   } else {
     syncfile();
 
-    //optionの作成
-     postData = {
-      url: "https://" + ServerIP,
-      method: "POST",
-      headers: headers,
-      json: true,
-      form: {
+    //postData
+     POSTData = {
         Name: Client_Name,
         CPU_IOWait: CPU_IOWait,
         NetworkIO: NetworkIO,
         DiskIO: DiskIO,
         RAM: RAMstatus,
         DiskFree: DiskFree
-      }
     };
     httpspost();
   }
