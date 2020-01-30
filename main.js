@@ -415,7 +415,7 @@ function httpspost(){
         'Content-Length': Buffer.byteLength(POSTDataStr)
     }
 };
-let req = http.request(options, (res) => {
+let req = https.request(options, (res) => {
   console.log('STATUS: ' + res.statusCode);
   console.log('HEADERS: ' + JSON.stringify(res.headers));
   res.setEncoding('utf8');
