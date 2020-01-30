@@ -406,9 +406,9 @@ function httpspost(){
   POSTDataStr = JSON.stringify(POSTData);
   console.log(POSTDataStr)
   let options = {
-    host: HOST,
+    host: ServerIP,
     port: 443,
-    path: PATH,
+    path: ServerPATH,
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
