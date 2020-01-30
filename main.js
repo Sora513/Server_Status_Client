@@ -403,7 +403,7 @@ function syncfile() {
 
 //httpsでPOSTする関数
 function httpspost(){
-  POSTDataStr = JSON.stringify(postData);
+  POSTDataStr = JSON.stringify(POSTData);
   console.log(postDataStr)
   let options = {
     host: HOST,
