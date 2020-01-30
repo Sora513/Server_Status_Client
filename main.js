@@ -451,5 +451,3 @@ function CheckStatus() {
     httpspost();
   }
 }
-
-setInterval(CheckStatus, interval * 1000);
