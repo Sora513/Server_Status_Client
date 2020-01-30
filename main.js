@@ -1,7 +1,7 @@
 //Client設定
 const Client_Name = "<ClientName>"; //複数クライアントの環境で重複させない
 const interval = 1; //単位は秒[s]
-const ServerIP = "kokubotech.site";
+const ServerIP = "<ServerIP>";
 const ServerPATH = "/api/serverstate";
 
 //非同期でexecを読み込み
