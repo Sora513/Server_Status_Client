@@ -2,11 +2,12 @@
 const Client_Name = "<ClientName>"; //複数クライアントの環境で重複させない
 const interval = 1; //単位は秒[s]
 const ServerIP = "127.21.28.179";
+const ServerPATH = "/api/serverstate";
 
 //非同期でexecを読み込み
 const exec = require("child_process").exec;
-//requestをrequire
-// var request = require('request');
+//httpsモジュール
+const https = require("https")
 //filesystem読み込み
 const fs = require("fs");
 
@@ -46,11 +47,19 @@ var DiskIO = [];
 //RAM
 var RAM = [];
 var RAMstatus = {};
+//DiskFree
+var df = [];
+var dfname = [];
+var dftotal = [];
+var dffree = [];
+var DiskFree = [];
 
 //ヘッダーを定義
 const headers = {
   "Content-Type": "application/json"
 };
+//POSTData
+var POSTData={}
 
 //起動時のみ実行する
 function setupfunc() {
@@ -111,7 +120,9 @@ function setupfunc() {
   RAM = fs
     .readFileSync("/proc/meminfo")
     .toString()
-    .split(/\r\n|\r|\n/);
+    .split(/\r\n|\r|\n/).filter(function(e) {
+        return e !== "";
+      });;
 
   for (var i = 0; i < RAM.length; i++) {
     switch (
@@ -169,6 +180,35 @@ function setupfunc() {
     }
   }
 
+  //DiskFree
+  exec("df -m", (err, stdout, stderr) => {
+    if (err | stderr) {
+      console.log("err");
+    } else {
+      df = stdout.split(/\r\n|\r|\n/).filter(function(e) {
+        return e !== "";
+      });;
+      for (var i = 0; i < df.length - 1; i++) {
+        dfname[i] = df[i + 1].split(/\s/).filter(function(e) {
+          return e !== "";
+        })[0];
+
+        dftotal[i] = df[i + 1].split(/\s/).filter(function(e) {
+          return e !== "";
+        })[1];
+
+        dffree[i] = df[i + 1].split(/\s/).filter(function(e) {
+          return e !== "";
+        })[3];
+        DiskFree.push({
+          Name: dfname[i],
+          DiskTotal: dftotal[i],
+          DiskFree: dffree[i]
+        });
+      }
+    }
+  });
+
   console.log("Setup Complete");
 }
 
@@ -194,9 +234,12 @@ function syncfile() {
       console.log(err);
     } else {
       NetworkIO = [];
-      Network = data.toString().split(/\r\n|\r|\n/).filter(function(e) {
-        return e !== "";
-      });;
+      Network = data
+        .toString()
+        .split(/\r\n|\r|\n/)
+        .filter(function(e) {
+          return e !== "";
+        });
       for (var i = 0; i < Network.length - 2; i++) {
         //空文字をfillterで消去
         Network_name[i] = Network[2 + i].split(/\s/).filter(function(e) {
@@ -229,9 +272,12 @@ function syncfile() {
       console.log(err);
     } else {
       DiskIO = [];
-      Disk = data.toString().split(/\r\n|\r|\n/).filter(function(e) {
-        return e !== "";
-      });;
+      Disk = data
+        .toString()
+        .split(/\r\n|\r|\n/)
+        .filter(function(e) {
+          return e !== "";
+        });
       for (var i = 0; i < Disk.length; i++) {
         //空文字を消去
         Disk_name[i] = Disk[i].split(/\s/).filter(function(e) {
@@ -263,7 +309,9 @@ function syncfile() {
       console.log(err);
     } else {
       RAMstatus = {};
-      RAM = data.toString().split(/\r\n|\r|\n/);
+      RAM = data.toString().split(/\r\n|\r|\n/).filter(function(e) {
+        return e !== "";
+      });;
       for (var i = 0; i < RAM.length; i++) {
         switch (
           RAM[i].split(/\s/).filter(function(e) {
@@ -321,6 +369,41 @@ function syncfile() {
       }
     }
   });
+
+  exec("df -m", (err, stdout, stderr) => {
+    if (err | stderr) {
+      console.log("err");
+    } else {
+      DiskFree = [];
+      df = stdout.split(/\r\n|\r|\n/).filter(function(e) {
+        return e !== "";
+      });;
+      for (var i = 0; i < df.length - 1; i++) {
+        dfname[i] = df[i + 1].split(/\s/).filter(function(e) {
+          return e !== "";
+        })[0];
+
+        dftotal[i] = df[i + 1].split(/\s/).filter(function(e) {
+          return e !== "";
+        })[1];
+
+        dffree[i] = df[i + 1].split(/\s/).filter(function(e) {
+          return e !== "";
+        })[3];
+        DiskFree.push({
+          Name: dfname[i],
+          DiskTotal: dftotal[i],
+          DiskFree: dffree[i]
+        });
+      }
+    }
+  });
+}
+
+//httpsでPOSTする関数
+function httpspost(){
+  let postDataStr = JSON.stringify(postData);
+  console.log(postDataStr)
 }
 
 //定期実行する関数の定義
@@ -332,15 +415,8 @@ function CheckStatus() {
   } else {
     syncfile();
 
-    exec("ls", (err, stdout, stderr) => {
-      if (err) {
-        //  console.log("err")
-      }
-      console.log(stdout);
-    });
-
     //optionの作成
-    var options = {
+     postData = {
       url: "https://" + ServerIP,
       method: "POST",
       headers: headers,
@@ -350,10 +426,11 @@ function CheckStatus() {
         CPU_IOWait: CPU_IOWait,
         NetworkIO: NetworkIO,
         DiskIO: DiskIO,
-        RAM: RAMstatus
+        RAM: RAMstatus,
+        DiskFree: DiskFree
       }
     };
-    console.log(options.form);
+    httpspost();
   }
 }
 
