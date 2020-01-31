@@ -132,7 +132,7 @@ function setupfunc() {
       })[0]
     ) {
       case "MemTotal:":
-        RAMstatus.MenTotal = Math.round(
+        RAMstatus.MemTotal = Math.round(
           RAM[i].split(/\s/).filter(function(e) {
             return e !== "";
           })[1] / 1000
@@ -140,7 +140,7 @@ function setupfunc() {
         break;
 
       case "MemFree:":
-        RAMstatus.MenFree = Math.round(
+        RAMstatus.MemFree = Math.round(
           RAM[i].split(/\s/).filter(function(e) {
             return e !== "";
           })[1] / 1000
@@ -320,7 +320,7 @@ function syncfile() {
           })[0]
         ) {
           case "MemTotal:":
-            RAMstatus.MenTotal = Math.round(
+            RAMstatus.MemTotal = Math.round(
               RAM[i].split(/\s/).filter(function(e) {
                 return e !== "";
               })[1] / 1000
@@ -328,7 +328,7 @@ function syncfile() {
             break;
 
           case "MemFree:":
-            RAMstatus.MenFree = Math.round(
+            RAMstatus.MemFree = Math.round(
               RAM[i].split(/\s/).filter(function(e) {
                 return e !== "";
               })[1] / 1000
